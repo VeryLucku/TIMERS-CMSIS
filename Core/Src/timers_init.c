@@ -26,14 +26,15 @@ void timer1_PWM_init()
         APB2_Timer_Clock = APB2_Timer_Clock * 2;
     }
 
-    // setup timer prescaler to count with 10kHz freq
-    TIM1->PSC = APB2_Timer_Clock/10000 - 1;
+    
+    // setup ARR
+    TIM1->ARR = ARR_MAX - 1;
 
-    // setup PWM freq
-    TIM1->ARR = 10000/PWM_freq - 1;
+    // setup timer prescaler to setup PWM freq
+    TIM1->PSC = APB2_Timer_Clock / (ARR_MAX * PWM_freq) - 1;
 
     // setup duty cycle to 50 %
-    TIM1->CCR1 = TIM1->ARR / 2;
+    TIM1->CCR1 = TIM1->ARR / 2 + 1;
 
     // setup 1 channel to output
     SET_BIT(TIM1->CCER, TIM_CCER_CC1E);
