@@ -106,11 +106,15 @@ void timer3_PWM_input_init()
     // conf ch2 as inpit and map on TI1
     SET_BIT(TIM3->CCMR1, 0b10 << TIM_CCMR1_CC2S_Pos);
 
-    // enable capture at rising adge
-    SET_BIT(TIM3->CCER, TIM_CCER_CC1E);
+    // enable capture of ch1 at rising edge
+    CLEAR_BIT(TIM3->CCER, TIM_CCER_CC1P);
+    // enable capture of ch2 at lowing edge
+    SET_BIT(TIM3->CCER, TIM_CCER_CC2P);
+    
 
-    // enable capture at lowing adge
-    CLEAR_BIT(TIM3->CCER, TIM_CCER_CC2E);
+    // enable capture
+    SET_BIT(TIM3->CCER, TIM_CCER_CC1E);
+    SET_BIT(TIM3->CCER, TIM_CCER_CC2E);
 
     // upcounting
     CLEAR_BIT(TIM3->CR1, TIM_CR1_DIR);
@@ -120,9 +124,10 @@ void timer3_PWM_input_init()
 
     // enable CC event
     SET_BIT(TIM3->EGR, TIM_EGR_CC1G);
+    SET_BIT(TIM3->EGR, TIM_EGR_CC2G);
 
-    // enable CC interrupt
-    SET_BIT(TIM3->DIER, TIM_DIER_CC1IE);
+    // enable CC2 interrupt
+    //SET_BIT(TIM3->DIER, TIM_DIER_CC1IE);
     SET_BIT(TIM3->DIER, TIM_DIER_CC2IE);
 
     // enable interrupts
@@ -132,13 +137,15 @@ void timer3_PWM_input_init()
     SET_BIT(TIM3->CR1, TIM_CR1_CEN);
 }
 
+
+uint32_t pulse = 0;
+uint32_t period = 0;
 void TIM3_IRQHandler(void)
 {
-    if (READ_BIT(TIM3->SR, TIM_SR_CC1IF)) {
-        CLEAR_BIT(TIM3->SR, TIM_SR_CC1IF);
-    }
-
+    // measure pulse and period of PWM signal as captured values in CCR1 and CCR2 registers
     if (READ_BIT(TIM3->SR, TIM_SR_CC2IF)) {
+        period = TIM3->CCR2;
+        pulse = TIM3->CCR1;
         CLEAR_BIT(TIM3->SR, TIM_SR_CC2IF);
     }
 }
