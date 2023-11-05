@@ -100,11 +100,17 @@ void timer3_PWM_input_init()
     // reset the counter after trigger event
     MODIFY_REG(TIM3->SMCR, TIM_SMCR_SMS, TIM_SMCR_SMS_2);
 
-    // conf as inpit and map on TI1
+    // conf ch1 as inpit and map on TI1
     SET_BIT(TIM3->CCMR1, 0b01 << TIM_CCMR1_CC1S_Pos);
+
+    // conf ch2 as inpit and map on TI1
+    SET_BIT(TIM3->CCMR1, 0b10 << TIM_CCMR1_CC2S_Pos);
 
     // enable capture at rising adge
     SET_BIT(TIM3->CCER, TIM_CCER_CC1E);
+
+    // enable capture at lowing adge
+    CLEAR_BIT(TIM3->CCER, TIM_CCER_CC2E);
 
     // upcounting
     CLEAR_BIT(TIM3->CR1, TIM_CR1_DIR);
@@ -117,6 +123,7 @@ void timer3_PWM_input_init()
 
     // enable CC interrupt
     SET_BIT(TIM3->DIER, TIM_DIER_CC1IE);
+    SET_BIT(TIM3->DIER, TIM_DIER_CC2IE);
 
     // enable interrupts
     NVIC_EnableIRQ(TIM3_IRQn);
@@ -125,7 +132,13 @@ void timer3_PWM_input_init()
     SET_BIT(TIM3->CR1, TIM_CR1_CEN);
 }
 
-/*void TIM3_IRQHandler(void)
+void TIM3_IRQHandler(void)
 {
-    CLEAR_BIT(TIM3->SR, TIM_SR_CC1IF);
-}*/
+    if (READ_BIT(TIM3->SR, TIM_SR_CC1IF)) {
+        CLEAR_BIT(TIM3->SR, TIM_SR_CC1IF);
+    }
+
+    if (READ_BIT(TIM3->SR, TIM_SR_CC2IF)) {
+        CLEAR_BIT(TIM3->SR, TIM_SR_CC2IF);
+    }
+}
