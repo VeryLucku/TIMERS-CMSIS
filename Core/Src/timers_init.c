@@ -1,15 +1,12 @@
 #include "timers_init.h"
+#include "gpio.h"
 
 void timer1_PWM_init()
 {
     // Enable tacting of ports
     SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
 
-    // timer1 ports - enable alternate function mode
-    MODIFY_REG(GPIOA->MODER, GPIO_MODER_MODE8, 0b10 << GPIO_MODER_MODE8_Pos);
-
-    // change to timer1 mode
-    MODIFY_REG(GPIOA->AFR[1], GPIO_AFRH_AFSEL8, 1 << GPIO_AFRH_AFSEL8_Pos);
+    alt_func_setup(GPIOA, 8, 1);
 
     // enable tacting of timer1
     SET_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM1EN);
@@ -66,11 +63,7 @@ void timer3_PWM_input_init()
     // Enable tacting of ports
     SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
 
-    // timer2 ports - enable alternate function mode
-    MODIFY_REG(GPIOA->MODER, GPIO_MODER_MODE6, 0b10 << GPIO_MODER_MODE6_Pos);
-
-    // change to timer3 mode
-    MODIFY_REG(GPIOA->AFR[0], GPIO_AFRL_AFSEL6, 2 << GPIO_AFRL_AFSEL6_Pos);
+    alt_func_setup(GPIOA, 6, 2);
 
     // enable tacting of timer1
     SET_BIT(RCC->APB1ENR, RCC_APB1ENR_TIM3EN);
