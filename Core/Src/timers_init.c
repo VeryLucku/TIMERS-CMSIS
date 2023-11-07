@@ -137,8 +137,8 @@ void TIM3_IRQHandler(void)
 {
     // measure pulse and period of PWM signal as captured values in CCR1 and CCR2 registers
     if (READ_BIT(TIM3->SR, TIM_SR_CC2IF)) {
+        CLEAR_BIT(TIM3->SR, TIM_SR_CC2IF);
         period = TIM3->CCR2;
         pulse = TIM3->CCR1;
-        CLEAR_BIT(TIM3->SR, TIM_SR_CC2IF);
     }
 }
